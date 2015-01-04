@@ -1,0 +1,29 @@
+# salt-init
+
+This tool is for simple server management with [Salt Stack](http://www.saltstack.com/).
+
+What it does is:
+ * Bootstraps Salt Stack (via [salt-bootstrap](https://github.com/saltstack/salt-bootstrap/))
+ * Allows you to combine multiple Salt state trees into one and run the states
+
+## Usage
+
+ 1. Fork this repository
+ 1. Edit the files under default/ with any and all "default" states you want applied on all of your servers
+ 1. Add git submodules ([git submodule add](http://git-scm.com/book/en/v2/Git-Tools-Submodules)) for other Salt state trees you might want merged on some of your servers
+ 1. Check out your repository on the target server, with the submodules:
+    ```
+	git clone --recursive https://github.com/your-name/your-fork.git
+	# Or on older versions of git
+	git clone https://github.com/your-name/your-fork.git
+	cd your-fork
+	git submodule update --init --recursive
+    ```
+ 1. Run initialize.sh, you can give it the paths of the extra salt states 
+ trees (directories containing top.sls). The "default" tree will always be applied:
+    ```
+    cd your-fork
+    ./initialize.sh
+    # Or:
+    ./initialize.sh submoduleA/salt submoduleB/foo/bar/salt/
+    ```

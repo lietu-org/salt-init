@@ -42,21 +42,21 @@ function download_bootstrap {
 function bootstrap_salt {
 	local bootstrap_file="salt-bootstrap.sh"
 
-	if [[ $(which salt-call 2>/dev/null) ==  ]];
+	if [[ $(which salt-call >/dev/null 2>&1; echo $?) != "0" ]]; then
+		if [[ ! -f "$bootstrap_file" ]]; then
+			download_bootstrap "$bootstrap_file"
+		fi
 
-	if [[ ! -f "$bootstrap_file" ]]; then
-		download_bootstrap "$bootstrap_file"
+		echo "Bootstrapping salt"
+		bash "$bootstrap_file" $SALT_BOOTSTRAP_ARGS
 	fi
-
-	echo "Bootstrapping salt"
-	bash "$bootstrap_file" $SALT_BOOTSTRAP_ARGS
 }
 
 function generate_top_sls {
 	echo "Generating top.sls for the combined state trees"
 
 	# PyYAML should be installed by Salt Stack
-	python merge_top_sls.py "$SALT_PACKAGES" > "/srv/salt/top.sls"
+	python merge_top_sls.py $SALT_PACKAGES > "/srv/salt/top.sls"
 }
 
 function setup_salt_configuration {
@@ -68,7 +68,7 @@ function setup_salt_configuration {
 	mkdir -p "$salt" "$pillar"
 	touch "$pillar/top.sls"
 
-	for pkg in "$SALT_PACKAGES"; do
+	for pkg in $SALT_PACKAGES; do
 		echo "Copying $pkg contents"
 		cp -a "$pkg"/* "$salt"
 	done
